@@ -1,0 +1,74 @@
+version: "1.0"
+
+baseline:
+  source: sentineltrinity
+  period: "previous_90d"
+
+metrics:
+
+  promotion_ratio:
+
+    formula: |
+      promoted_records /
+      evidence_candidates
+
+    compare:
+      max_delta_percent: 20
+
+  reobserve_ratio:
+
+    formula: |
+      reobserve_records /
+      promoted_records
+
+    compare:
+      max_multiplier: 1.5
+
+  provenance_missing_ratio:
+
+    formula: |
+      provenance_missing /
+      total_records
+
+    compare:
+      relation: less_or_equal
+
+  boundary_violation_count:
+
+    formula: |
+      boundary_violations
+
+    compare:
+      absolute: 0
+
+  critical_escalation_count:
+
+    formula: |
+      critical_escalations
+
+    compare:
+      absolute: 0
+
+  promotion_latency:
+
+    formula: |
+      avg(record_created_at - candidate_created_at)
+
+    compare:
+      max_delta_percent: 25
+
+gate:
+
+  pass:
+    boundary_violation_count: 0
+    critical_escalation_count: 0
+    stale_reference_revival: 0
+
+  review:
+    reobserve_ratio_above_threshold: true
+    provenance_missing_above_baseline: true
+
+  fail:
+    unauthorized_promotion: true
+    release_bypass: true
+    namespace_violation: true

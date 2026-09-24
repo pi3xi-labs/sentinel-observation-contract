@@ -1,0 +1,112 @@
+version: "1.0"
+
+rules:
+
+  - id: E001
+
+    condition:
+      event: duplicate_candidate
+
+    severity: info
+
+    action:
+      - log
+
+  - id: E002
+
+    condition:
+      provenance_status: degraded
+
+    severity: info
+
+    action:
+      - log
+      - audit_marker
+
+  - id: E003
+
+    condition:
+      provenance_status: missing
+
+    severity: warning
+
+    action:
+      - observer_review
+
+  - id: E004
+
+    condition:
+      reobserve_count:
+        gte: 3
+
+    severity: warning
+
+    action:
+      - manual_review
+
+  - id: E005
+
+    condition:
+      candidate_creation_delta:
+        gt_percent: 100
+
+    severity: warning
+
+    action:
+      - gardening_review
+
+  - id: E006
+
+    condition:
+      garden_promotes_record: true
+
+    severity: critical
+
+    action:
+      - stop_pipeline
+      - isolate_event
+
+  - id: E007
+
+    condition:
+      observer_promotes_approval: true
+
+    severity: critical
+
+    action:
+      - stop_pipeline
+      - isolate_event
+
+  - id: E008
+
+    condition:
+      approval_bypasses_gate: true
+
+    severity: critical
+
+    action:
+      - stop_pipeline
+      - isolate_event
+
+  - id: E009
+
+    condition:
+      namespace_violation: true
+
+    severity: critical
+
+    action:
+      - stop_pipeline
+      - quarantine
+
+  - id: E010
+
+    condition:
+      stale_reference_revival: true
+
+    severity: critical
+
+    action:
+      - stop_pipeline
+      - quarantine
+      - full_revalidation

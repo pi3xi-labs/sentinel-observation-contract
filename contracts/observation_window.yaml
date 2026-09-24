@@ -1,0 +1,87 @@
+version: "1.0"
+
+window:
+  name: boundary_integrity_observation
+  start: "2026-09-25T00:00:00+09:00"
+  duration: "7d"
+
+objective:
+  - escalation_detection
+  - promotion_integrity
+  - boundary_integrity
+  - baseline_delta_measurement
+
+non_objective:
+  - long_term_retention
+  - maturity_assessment
+  - provenance_longevity
+
+observations:
+
+  O01:
+    name: candidate_creation
+
+    metric:
+      - ec_created_total
+      - ec_created_by_source
+
+    threshold:
+      spike_factor: 2.0
+
+  O02:
+    name: promotion_flow
+
+    metric:
+      - ec_to_cr
+      - cr_to_approval
+      - approval_to_artifact
+
+    expected:
+      unauthorized_promotion: 0
+
+  O03:
+    name: escalation_event
+
+    metric:
+      - escalation_count_info
+      - escalation_count_warning
+      - escalation_count_critical
+
+  O04:
+    name: provenance_status
+
+    metric:
+      - complete
+      - degraded
+      - missing
+
+  O05:
+    name: duplicate_detection
+
+    metric:
+      - duplicate_candidate_count
+
+    expected:
+      duplicate_detected: true
+
+  O06:
+    name: boundary_violation
+
+    metric:
+      - garden_to_record
+      - observer_to_approval
+      - mokuren_to_artifact
+
+    expected:
+      count: 0
+
+  O07:
+    name: stale_reference_revival
+
+    metric:
+      - stale_ec_reuse
+      - stale_cr_reuse
+      - stale_approval_reuse
+
+    expected:
+      count: 0
