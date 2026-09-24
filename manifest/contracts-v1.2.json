@@ -2,5 +2,45 @@
   "version": "contracts-v1.2",
   "lock": "Integrity Lock",
   "algorithm": "sha256",
-  "files": {}
+  "files": {
+    "README.md": {
+      "sha256": "cb4f0fb30dc7311b7d3c6ac7e5a8fde31dce7b4f2a0e6cd7c31f1ba4e288ee89"
+    },
+    "GOVERNANCE.md": {
+      "sha256": "c1703110aa2d24e1b408ced0168034d418a08c2af5fe9be271040ebfb3ca47e1"
+    },
+    "LICENSE": {
+      "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+    },
+    "contracts/README.md": {
+      "sha256": "99307e23068a84bfff99f04436f62d058614741efda747953aac53284aab6e94"
+    },
+    "contracts/observation_window.yaml": {
+      "sha256": "8fbf82ab5dae75f052751cdbdc6be5f72b56b13817c294b5ff35f721a5b1ec71"
+    },
+    "contracts/escalation_rules.yaml": {
+      "sha256": "c0dba85390fb84609cb7c8b6d77dba7544c97020ab83ad164aefdcef2fef250c"
+    },
+    "contracts/delta_policy.yaml": {
+      "sha256": "9cc6a8cd1626419b8f952f7bddb99717f6adeefb304f5f72d81e46be542e6db3"
+    },
+    "tools/validate_contracts.py": {
+      "sha256": "f4221605f34e7fee56e06de9b693e5a29ecb29a61b9be54f487d33658378f047"
+    },
+    "tools/validate_manifest.py": {
+      "sha256": "ec19123af3d5c50428436a20f6bda513f1bd1194a11d4613cd0ebdb685d7ad2a"
+    },
+    "tools/generate_manifest.py": {
+      "sha256": "2b7cf5d571e17fa8580386450c0d357d0bc3d6b9aebdce7449a8548581f69739"
+    },
+    "tests/contract_examples.yaml": {
+      "sha256": "3ba6ccedb1da0dc43390ba033458f65e13f3c504cdbe88c822d0ef2ed30805b8"
+    },
+    "tests/evaluate_examples.py": {
+      "sha256": "1e55483caa45d59a3b9cb0f46d1684e412a974ac6a4eb149f2b1a8ecbbe65a78"
+    },
+    ".github/workflows/contracts.yml": {
+      "sha256": "0d42723c1c5270f3dd12d089357875919a77ceffc3fd4edf96871e1bba3e3685"
+    }
+  }
 }
