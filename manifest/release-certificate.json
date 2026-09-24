@@ -1,0 +1,18 @@
+{
+  "approval": "Publication Lock + Integrity Lock confirmed; Signature Lock model adopted.",
+  "canonical_repository": "pi3xi-labs/sentinel-observation-contract",
+  "lock": "Signature Lock",
+  "manifest": "manifest/contracts-v1.3.json",
+  "manifest_sha256": "1e8ddbd794cb6ef56daf79215d6d22a99ab1e53f44b2a3caf1ae1cded576e133",
+  "release": "contracts-v1.3",
+  "requires": [
+    "Structure Lock",
+    "Behavior Lock",
+    "Integrity Lock",
+    "Signature Lock"
+  ],
+  "signing": {
+    "method": "certificate-v1",
+    "status": "model"
+  }
+}
