@@ -2,8 +2,8 @@
 
 A frozen audit contract for observation, escalation, and delta evaluation.
 
-**Current Stable Release:** `contracts-v1.2`  
-**Compatibility Level:** Integrity Lock
+**Current Stable Release:** `contracts-v1.3`  
+**Compatibility Level:** Signature Lock
 
 ## Repositories
 
@@ -73,6 +73,7 @@ Run validations:
 python tools/validate_contracts.py
 python tests/evaluate_examples.py
 python tools/validate_manifest.py
+python tools/validate_signature.py
 ```
 
 ## Lock Model
@@ -81,6 +82,7 @@ python tools/validate_manifest.py
 v1.0  Structure Lock
 v1.1  Behavior Lock
 v1.2  Integrity Lock
+v1.3  Signature Lock
 v2.x  Contract Evolution
 ```
 
@@ -96,6 +98,7 @@ Current:
 - Normative behavior verification
 - Manifest verification
 - Release artifact integrity verification
+- Release certificate / Signature Lock verification
 
 ## Governance
 
