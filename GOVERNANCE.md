@@ -26,6 +26,13 @@ It must point here as the canonical source of the published contract.
 - Replay via `tests/evaluate_examples.py` against live `delta_policy` thresholds
 - CI fails when published outcomes change without intentional revision
 
+### v1.2 — Integrity Lock
+
+- Hash manifest at `manifest/contracts-v1.2.json`
+- `tools/generate_manifest.py` produces content-addressed sha256 digests (no commit field)
+- `tools/validate_manifest.py` verifies frozen artifact digests against the manifest
+- CI Integrity Lock step fails on any protected-file drift
+
 ### v2.x — Contract Evolution
 
 Breaking changes to observation semantics, escalation meaning, thresholds that alter normative outcomes, or gate vocabulary.
@@ -33,14 +40,9 @@ Breaking changes to observation semantics, escalation meaning, thresholds that a
 ## Change Rules
 
 - Structure or meaning breaks → Major (`v2.x`)
-- Additive documentation, Behavior Lock fixtures, or non-semantic clarification → Minor (`v1.x`)
+- Additive documentation, Behavior Lock fixtures, Integrity Lock tooling, or non-semantic clarification → Minor (`v1.x`)
 - Typo / formatting only → Patch (optional)
 
 ## Release Tags
 
 Prefer tags of the form `contracts-vX.Y` pinned to a specific commit.
-
-## Future Hardening (optional)
-
-- Contract hash manifest
-- Signed releases
