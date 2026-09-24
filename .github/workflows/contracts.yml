@@ -17,6 +17,11 @@ jobs:
 
       - run: pip install pyyaml
 
-      - run: python tools/validate_contracts.py
+      - name: Structure Lock
+        run: python tools/validate_contracts.py
 
-      - run: python tests/evaluate_examples.py
+      - name: Behavior Lock
+        run: python tests/evaluate_examples.py
+
+      - name: Integrity Lock
+        run: python tools/validate_manifest.py
