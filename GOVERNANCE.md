@@ -1,48 +1,113 @@
 # Governance
 
-## Canonical Repository
+## Purpose
 
-After Publication Lock, the canonical public contract is:
+This repository maintains the canonical Sentinel Observation Contract.
+
+The governance model protects the contract through progressive lock levels.
+
+---
+
+## Lock Levels
+
+### Structure Lock (v1.0)
+
+Protects contract structure.
+
+Scope:
+
+- repository layout
+- required contract files
+- O01–O07 observation identifiers
+- E001–E010 escalation identifiers
+- gate section existence
+
+Examples:
+
+```text
+contracts/
+├─ observation_window.yaml
+├─ escalation_rules.yaml
+└─ delta_policy.yaml
+```
+
+Breaking any item above requires a major-version review.
+
+---
+
+### Behavior Lock (v1.1)
+
+Protects contract semantics.
+
+Normative examples:
+
+```text
+promotion_delta=-6.25
+→ pass
+
+reobserve_multiplier=1.78
+→ review
+
+boundary_violation=1
+→ fail
+```
+
+Any change that alters these outcomes is considered contract-breaking.
+
+---
+
+### Integrity Lock (v1.2)
+
+Protects released artifacts.
+
+Scope:
+
+- hash manifest contents
+- manifest consistency
+- reproducible release assets
+- release integrity validation
+
+Integrity Lock does not define behavior.
+
+Integrity Lock verifies that released artifacts remain unchanged.
+
+---
+
+### Contract Evolution (v2.x)
+
+Major versions may introduce:
+
+- new contract types
+- new lock levels
+- new evaluation semantics
+- new observation models
+
+Breaking changes are allowed only through major-version releases.
+
+---
+
+## Canonical References
+
+Public contract repository:
 
 `pi3xi-labs/sentinel-observation-contract`
 
-`wizyig/gbox` remains the operational / scaffolding repository.
-It must point here as the canonical source of the published contract.
+Operational repository:
 
-## Version Levels
+`wizyig/gbox`
 
-### v1.0 — Structure Lock
+---
 
-- Contract files present (`observation_window`, `escalation_rules`, `delta_policy`)
-- YAML parse integrity
-- Observation IDs O01–O07
-- Escalation IDs E001–E010
-- `gate` section (`pass` / `review` / `fail`)
-- CI contracts-check
+## Compatibility Principle
 
-### v1.1 — Behavior Lock
+```text
+Structure Lock
+    ↓
+Behavior Lock
+    ↓
+Integrity Lock
+```
 
-- Normative examples in `tests/contract_examples.yaml`
-- Replay via `tests/evaluate_examples.py` against live `delta_policy` thresholds
-- CI fails when published outcomes change without intentional revision
+Each lock level builds upon all previous levels.
 
-### v1.2 — Integrity Lock
-
-- Hash manifest at `manifest/contracts-v1.2.json`
-- `tools/generate_manifest.py` produces content-addressed sha256 digests (no commit field)
-- `tools/validate_manifest.py` verifies frozen artifact digests against the manifest
-- CI Integrity Lock step fails on any protected-file drift
-
-### v2.x — Contract Evolution
-
-Breaking changes to observation semantics, escalation meaning, thresholds that alter normative outcomes, or gate vocabulary.
-
-## Change Rules
-
-- Structure or meaning breaks → Major (`v2.x`)
-- Additive documentation, Behavior Lock fixtures, Integrity Lock tooling, or non-semantic clarification → Minor (`v1.x`)
-- Typo / formatting only → Patch (optional)
-
-## Release Tags
-
-Prefer tags of the form `contracts-vX.Y` pinned to a specific commit.
+A release claiming a higher lock level must satisfy all lower lock levels.
