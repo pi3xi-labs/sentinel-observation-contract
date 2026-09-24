@@ -1,0 +1,60 @@
+# Phase D.1 draft — Sigstore / cosign release signing
+#
+# contracts-v1.3 ships the Signature Lock *model* via
+# manifest/release-certificate.json (method: certificate-v1).
+# This workflow is intentionally workflow_dispatch-only and does
+# not run on push/PR so merge cannot break CI without cosign/OIDC.
+#
+# Future upgrade path:
+#   signing.method → "sigstore-cosign-blob"
+#   signing.status → "signed"
+#   produce/verify manifest/contracts-v1.3.sig with cosign
+
+name: sign-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to attest (e.g. contracts-v1.3)"
+        required: true
+        default: "contracts-v1.3"
+      manifest_path:
+        description: "Integrity Lock manifest path"
+        required: true
+        default: "manifest/contracts-v1.3.json"
+
+jobs:
+  document-only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag }}
+
+      - name: Confirm certificate model (Phase D)
+        run: |
+          set -euo pipefail
+          echo "Signature Lock Phase D uses certificate-v1."
+          echo "Release tag: ${{ inputs.release_tag }}"
+          echo "Manifest: ${{ inputs.manifest_path }}"
+          test -f manifest/release-certificate.json
+          test -f "${{ inputs.manifest_path }}"
+          python tools/validate_signature.py
+          echo "Cosign blob signing is deferred to Phase D.1."
+          echo "Do not enable push/PR triggers until OIDC + cosign are configured."
+
+      # Phase D.1 (inactive until secrets/OIDC ready):
+      # - name: Install cosign
+      #   uses: sigstore/cosign-installer@v3
+      # - name: Sign manifest blob
+      #   run: |
+      #     cosign sign-blob --yes \
+      #       --output-signature "manifest/${{ inputs.release_tag }}.sig" \
+      #       "${{ inputs.manifest_path }}"
+      # - name: Verify manifest blob
+      #   run: |
+      #     cosign verify-blob \
+      #       --signature "manifest/${{ inputs.release_tag }}.sig" \
+      #       "${{ inputs.manifest_path }}"
