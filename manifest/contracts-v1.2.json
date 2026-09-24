@@ -1,0 +1,14 @@
+{
+  "files": {
+    "GOVERNANCE.md": "1175f049696b387dbbcd887d35dfef721f7bb6c7d3c413fad82b2763a11dd5b7",
+    "README.md": "cb4f0fb30dc7311b7d3c6ac7e5a8fde31dce7b4f2a0e6cd7c31f1ba4e288ee89",
+    "contracts/delta_policy.yaml": "9cc6a8cd1626419b8f952f7bddb99717f6adeefb304f5f72d81e46be542e6db3",
+    "contracts/escalation_rules.yaml": "c0dba85390fb84609cb7c8b6d77dba7544c97020ab83ad164aefdcef2fef250c",
+    "contracts/observation_window.yaml": "8fbf82ab5dae75f052751cdbdc6be5f72b56b13817c294b5ff35f721a5b1ec71",
+    "tests/evaluate_examples.py": "1e55483caa45d59a3b9cb0f46d1684e412a974ac6a4eb149f2b1a8ecbbe65a78",
+    "tools/validate_contracts.py": "f4221605f34e7fee56e06de9b693e5a29ecb29a61b9be54f487d33658378f047",
+    "tools/validate_manifest.py": "f61c7ad8c01316cfcf35c488cd420e7ad55012ac1d0f2d201541a2255fdb0ad5"
+  },
+  "lock": "Integrity Lock",
+  "release": "contracts-v1.2"
+}
