@@ -14,10 +14,11 @@ FILES = [
     "GOVERNANCE.md",
     "tools/validate_contracts.py",
     "tools/validate_manifest.py",
+    "tools/validate_signature.py",
     "tests/evaluate_examples.py",
 ]
 
-RELEASE = "contracts-v1.2"
+RELEASE = "contracts-v1.3"
 
 OUTPUT = ROOT / "manifest" / f"{RELEASE}.json"
 
@@ -34,7 +35,7 @@ def sha256_file(path: Path) -> str:
 
 manifest = {
     "release": RELEASE,
-    "lock": "Integrity Lock",
+    "lock": "Signature Lock",
     "files": {}
 }
 
