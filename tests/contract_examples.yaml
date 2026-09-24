@@ -1,0 +1,19 @@
+# Normative decision vectors for Sentinel Observation Contract Behavior Lock (v1.1).
+# Changing outcomes without a Major/intentional contract revision must fail CI.
+
+examples:
+
+  - name: promotion_delta_pass
+    metric: promotion_delta
+    value: -6.25
+    expected: pass
+
+  - name: reobserve_warning
+    metric: reobserve_multiplier
+    value: 1.78
+    expected: review
+
+  - name: boundary_violation_fail
+    metric: boundary_violation
+    value: 1
+    expected: fail
