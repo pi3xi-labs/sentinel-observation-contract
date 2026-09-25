@@ -28,3 +28,6 @@ jobs:
 
       - name: Integrity Lock
         run: python tools/validate_manifest.py
+
+      - name: Signature Lock
+        run: python tools/validate_signature.py

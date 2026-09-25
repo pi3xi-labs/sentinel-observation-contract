@@ -7,7 +7,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 
-MANIFEST = ROOT / "manifest" / "contracts-v1.2.json"
+MANIFEST = ROOT / "manifest" / "contracts-v1.3.json"
 
 
 def sha256_file(path: Path) -> str:

@@ -1,0 +1,15 @@
+{
+  "files": {
+    "GOVERNANCE.md": "2a7199152ccf3f299f968407b15e4f29cb1abb26abb388b8486dcd30ab30bbe4",
+    "README.md": "42380e114bd0ab8db62ddabab4162787e8f64e5bebe387fd18aeb9e22fc89f19",
+    "contracts/delta_policy.yaml": "9cc6a8cd1626419b8f952f7bddb99717f6adeefb304f5f72d81e46be542e6db3",
+    "contracts/escalation_rules.yaml": "c0dba85390fb84609cb7c8b6d77dba7544c97020ab83ad164aefdcef2fef250c",
+    "contracts/observation_window.yaml": "8fbf82ab5dae75f052751cdbdc6be5f72b56b13817c294b5ff35f721a5b1ec71",
+    "tests/evaluate_examples.py": "1e55483caa45d59a3b9cb0f46d1684e412a974ac6a4eb149f2b1a8ecbbe65a78",
+    "tools/validate_contracts.py": "f4221605f34e7fee56e06de9b693e5a29ecb29a61b9be54f487d33658378f047",
+    "tools/validate_manifest.py": "46c8ee69d4644eb414a49d05b21c9ff1e2a5ed351b4ad096282036b849ba6198",
+    "tools/validate_signature.py": "0d5d7e1236fb68490c7ddcb7f4bfaa9f5f3e9575e6be8feee8438c671a531f8e"
+  },
+  "lock": "Signature Lock",
+  "release": "contracts-v1.3"
+}
