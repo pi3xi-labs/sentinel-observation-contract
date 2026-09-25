@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Integrity Lock: verify the current release manifest against the tree."""
 
 from pathlib import Path
 import hashlib
@@ -7,7 +8,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 
-MANIFEST = ROOT / "manifest" / "contracts-v1.3.json"
+RELEASE = "contracts-v1.4"
+
+MANIFEST = ROOT / "manifest" / f"{RELEASE}.json"
 
 
 def sha256_file(path: Path) -> str:
@@ -30,12 +33,24 @@ def fail(msg):
     sys.exit(1)
 
 
+if not MANIFEST.exists():
+    fail(f"missing manifest: {MANIFEST.relative_to(ROOT)}")
+
 with open(MANIFEST, "r", encoding="utf-8") as f:
     manifest = json.load(f)
 
+if manifest.get("release") != RELEASE:
+    fail(f"manifest release must be {RELEASE}, got: {manifest.get('release')}")
+
 files = manifest.get("files", {})
 
+if not isinstance(files, dict) or not files:
+    fail("manifest files must be a non-empty mapping")
+
 for rel_path, expected_hash in files.items():
+
+    if rel_path.endswith(".bundle"):
+        fail(f"manifest must not hash a Sigstore bundle (circular): {rel_path}")
 
     target = ROOT / rel_path
 
@@ -51,4 +66,4 @@ for rel_path, expected_hash in files.items():
             f"actual={actual_hash}"
         )
 
-print("[PASS] manifest validation completed")
+print(f"[PASS] manifest validation completed ({MANIFEST.relative_to(ROOT)})")

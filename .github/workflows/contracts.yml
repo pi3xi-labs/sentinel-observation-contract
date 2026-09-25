@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -31,3 +34,23 @@ jobs:
 
       - name: Signature Lock
         run: python tools/validate_signature.py
+
+      - name: Reproducibility
+        run: |
+          set -euo pipefail
+          python tools/generate_manifest.py
+          git diff --exit-code manifest/
+          test -z "$(git status --porcelain manifest/)"
+          echo "[PASS] manifest is reproducible"
+
+      - name: Tag format
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^contracts-v[0-9]+\.[0-9]+$ ]]; then
+            echo "[FAIL] tag '$TAG' does not match ^contracts-v[0-9]+\.[0-9]+$"
+            exit 1
+          fi
+          echo "[PASS] tag format: $TAG"
