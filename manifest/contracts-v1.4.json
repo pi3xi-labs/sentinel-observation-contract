@@ -1,7 +1,7 @@
 {
   "files": {
     ".github/workflows/contracts.yml": "09f18837bbd0b77f3a9523196e23ca511489c6a488671ea4dde2ca60b52a4f72",
-    ".github/workflows/sign-release.yml": "497532c5bddb2bc7e48798c2930601c14240ccb624e0071a93ee9bd6e271d845",
+    ".github/workflows/sign-release.yml": "7373990661d8dafb578c6a21589b65c0113525cfcc074fc13995cc94e20b106a",
     "GOVERNANCE.md": "9f62352d7cc18acab6669f148da7a8dcc057f4afc769bb627e09025a53f74745",
     "README.md": "c08011dc026f0a3eb56e301566a0eb2568e72fe0350c83803a411a9a8a17bee7",
     "contracts/README.md": "99307e23068a84bfff99f04436f62d058614741efda747953aac53284aab6e94",

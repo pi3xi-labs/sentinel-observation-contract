@@ -3,7 +3,7 @@
   "canonical_repository": "pi3xi-labs/sentinel-observation-contract",
   "lock": "Sigstore Verification",
   "manifest": "manifest/contracts-v1.4.json",
-  "manifest_sha256": "734ef2fb8cf3a3a5ec3da2fa3f6780326581a2b8fe8587c4e41ed466ca8565de",
+  "manifest_sha256": "5500b7b9b8233b9fd054a258ae28d56e5b48840cfb084c744797252908784fa3",
   "provenance": {
     "bundle": "contracts-v1.4.bundle",
     "bundle_location": "release-asset",
