@@ -1,15 +1,23 @@
 {
-  "approval": "Publication Lock + Integrity Lock confirmed; Signature Lock model adopted.",
+  "approval": "Publication Lock + Integrity Lock confirmed; Signature Lock model retained; Sigstore Verification adopted.",
   "canonical_repository": "pi3xi-labs/sentinel-observation-contract",
-  "lock": "Signature Lock",
-  "manifest": "manifest/contracts-v1.3.json",
-  "manifest_sha256": "1e8ddbd794cb6ef56daf79215d6d22a99ab1e53f44b2a3caf1ae1cded576e133",
-  "release": "contracts-v1.3",
+  "lock": "Sigstore Verification",
+  "manifest": "manifest/contracts-v1.4.json",
+  "manifest_sha256": "5500b7b9b8233b9fd054a258ae28d56e5b48840cfb084c744797252908784fa3",
+  "provenance": {
+    "bundle": "contracts-v1.4.bundle",
+    "bundle_location": "release-asset",
+    "identity": "https://github.com/pi3xi-labs/sentinel-observation-contract/.github/workflows/sign-release.yml@refs/tags/contracts-v1.4",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "type": "sigstore-cosign-bundle"
+  },
+  "release": "contracts-v1.4",
   "requires": [
     "Structure Lock",
     "Behavior Lock",
     "Integrity Lock",
-    "Signature Lock"
+    "Signature Lock",
+    "Sigstore Verification"
   ],
   "signing": {
     "method": "certificate-v1",

@@ -1,0 +1,21 @@
+{
+  "files": {
+    ".github/workflows/contracts.yml": "09f18837bbd0b77f3a9523196e23ca511489c6a488671ea4dde2ca60b52a4f72",
+    ".github/workflows/sign-release.yml": "7373990661d8dafb578c6a21589b65c0113525cfcc074fc13995cc94e20b106a",
+    "GOVERNANCE.md": "9f62352d7cc18acab6669f148da7a8dcc057f4afc769bb627e09025a53f74745",
+    "README.md": "c08011dc026f0a3eb56e301566a0eb2568e72fe0350c83803a411a9a8a17bee7",
+    "contracts/README.md": "99307e23068a84bfff99f04436f62d058614741efda747953aac53284aab6e94",
+    "contracts/delta_policy.yaml": "9cc6a8cd1626419b8f952f7bddb99717f6adeefb304f5f72d81e46be542e6db3",
+    "contracts/escalation_rules.yaml": "c0dba85390fb84609cb7c8b6d77dba7544c97020ab83ad164aefdcef2fef250c",
+    "contracts/observation_window.yaml": "8fbf82ab5dae75f052751cdbdc6be5f72b56b13817c294b5ff35f721a5b1ec71",
+    "manifest/SIGNATURE.md": "141031b7c017fd454715b1d0d77d4fb00d7f73d0e65d370082e1c9bbb5b6d6e8",
+    "tests/contract_examples.yaml": "3ba6ccedb1da0dc43390ba033458f65e13f3c504cdbe88c822d0ef2ed30805b8",
+    "tests/evaluate_examples.py": "1e55483caa45d59a3b9cb0f46d1684e412a974ac6a4eb149f2b1a8ecbbe65a78",
+    "tools/generate_manifest.py": "cda80a4b921c6f6899a8bb4d645cfbd662d0501f36ff5316eee2cbea2c664f11",
+    "tools/validate_contracts.py": "f4221605f34e7fee56e06de9b693e5a29ecb29a61b9be54f487d33658378f047",
+    "tools/validate_manifest.py": "699b333fa9e2b16ad34f9a0b6047cc74932d39a8894ab42121c34b5b818c81eb",
+    "tools/validate_signature.py": "e15725231b7149900931c1864e90cecf5742c550a28249411c277ed2b507365f"
+  },
+  "lock": "Sigstore Verification",
+  "release": "contracts-v1.4"
+}
