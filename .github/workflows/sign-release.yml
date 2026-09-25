@@ -1,60 +1,224 @@
-# Phase D.1 draft — Sigstore / cosign release signing
+# contracts-v1.4 — Sigstore Verification (Phase D.1)
 #
-# contracts-v1.3 ships the Signature Lock *model* via
-# manifest/release-certificate.json (method: certificate-v1).
-# This workflow is intentionally workflow_dispatch-only and does
-# not run on push/PR so merge cannot break CI without cosign/OIDC.
+# On Release publish: validate all locks, sign the committed Integrity Lock
+# manifest (manifest/<tag>.json) keyless with cosign (GitHub OIDC), verify it
+# positively and negatively, and attach <tag>.json + <tag>.bundle to the Release.
 #
-# Future upgrade path:
-#   signing.method → "sigstore-cosign-blob"
-#   signing.status → "signed"
-#   produce/verify manifest/contracts-v1.3.sig with cosign
+# workflow_dispatch runs verify + sign only (test signing; nothing is published).
+# The `tag` input only names files. The signing identity is always this workflow
+# at the ref it runs on (refs/tags/<tag> on release, refs/heads/<branch> on dispatch).
 
 name: sign-release
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: "Release tag to attest (e.g. contracts-v1.3)"
+      tag:
+        description: "Release tag used to name files (manifest/<tag>.json, <tag>.bundle)"
         required: true
-        default: "contracts-v1.3"
-      manifest_path:
-        description: "Integrity Lock manifest path"
-        required: true
-        default: "manifest/contracts-v1.3.json"
+        default: "contracts-v1.4"
+
+permissions: {}
+
+env:
+  TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
+  EXPECTED_ISSUER: https://token.actions.githubusercontent.com
+  EXPECTED_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/sign-release.yml@${{ github.ref }}
 
 jobs:
-  document-only:
+  verify:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.release_tag }}
 
-      - name: Confirm certificate model (Phase D)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Release tag
         run: |
           set -euo pipefail
-          echo "Signature Lock Phase D uses certificate-v1."
-          echo "Release tag: ${{ inputs.release_tag }}"
-          echo "Manifest: ${{ inputs.manifest_path }}"
-          test -f manifest/release-certificate.json
-          test -f "${{ inputs.manifest_path }}"
-          python tools/validate_signature.py
-          echo "Cosign blob signing is deferred to Phase D.1."
-          echo "Do not enable push/PR triggers until OIDC + cosign are configured."
+          echo "event=${{ github.event_name }} ref=${{ github.ref }} TAG=$TAG"
+          if [[ ! "$TAG" =~ ^contracts-v[0-9]+\.[0-9]+$ ]]; then
+            echo "[FAIL] tag '$TAG' does not match ^contracts-v[0-9]+\.[0-9]+$"
+            exit 1
+          fi
+          if [[ "${{ github.event_name }}" == "release" && "${{ github.ref }}" != "refs/tags/$TAG" ]]; then
+            echo "[FAIL] release ref ${{ github.ref }} does not match refs/tags/$TAG"
+            exit 1
+          fi
+          test -f "manifest/${TAG}.json" || { echo "[FAIL] manifest/${TAG}.json missing"; exit 1; }
+          echo "[PASS] tag $TAG, manifest/${TAG}.json present"
 
-      # Phase D.1 (inactive until secrets/OIDC ready):
-      # - name: Install cosign
-      #   uses: sigstore/cosign-installer@v3
-      # - name: Sign manifest blob
-      #   run: |
-      #     cosign sign-blob --yes \
-      #       --output-signature "manifest/${{ inputs.release_tag }}.sig" \
-      #       "${{ inputs.manifest_path }}"
-      # - name: Verify manifest blob
-      #   run: |
-      #     cosign verify-blob \
-      #       --signature "manifest/${{ inputs.release_tag }}.sig" \
-      #       "${{ inputs.manifest_path }}"
+      - name: Structure Lock
+        run: python tools/validate_contracts.py
+
+      - name: Behavior Lock
+        run: python tests/evaluate_examples.py
+
+      - name: Integrity Lock
+        run: python tools/validate_manifest.py
+
+      - name: Signature Lock
+        run: python tools/validate_signature.py
+
+      - name: Reproducibility
+        run: |
+          set -euo pipefail
+          python tools/generate_manifest.py
+          git diff --exit-code manifest/
+          test -z "$(git status --porcelain manifest/)"
+          echo "[PASS] manifest is reproducible"
+
+  sign:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4
+        with:
+          cosign-release: "v3.0.6"
+
+      - name: Cosign version
+        run: cosign version
+
+      - name: Sign manifest (committed file, not regenerated)
+        run: |
+          set -euo pipefail
+          cosign sign-blob "manifest/${TAG}.json" --yes --bundle "${TAG}.bundle"
+          test -s "${TAG}.bundle"
+          sha256sum "manifest/${TAG}.json" "${TAG}.bundle"
+
+      - name: Verify (positive)
+        run: |
+          set -euo pipefail
+          echo "issuer=$EXPECTED_ISSUER"
+          echo "identity=$EXPECTED_IDENTITY"
+          cosign verify-blob "manifest/${TAG}.json" \
+            --bundle "${TAG}.bundle" \
+            --certificate-oidc-issuer "$EXPECTED_ISSUER" \
+            --certificate-identity "$EXPECTED_IDENTITY"
+
+      - name: Prepare negative test helper
+        run: |
+          cat > "$RUNNER_TEMP/expect_fail.sh" <<'SH'
+          #!/usr/bin/env bash
+          # usage: expect_fail.sh <label> <cosign args...>
+          # Passes only if cosign exits nonzero with a real verification error
+          # (not a usage / flag / missing-file error).
+          set -uo pipefail
+          label="$1"; shift
+          out="$(cosign "$@" 2>&1)"; rc=$?
+          echo "---- [$label] exit=$rc"
+          echo "$out" | tail -n 5
+          if [ "$rc" -eq 0 ]; then
+            echo "[FAIL] $label: verification unexpectedly succeeded"; exit 1
+          fi
+          if echo "$out" | grep -qiE "required flag|unknown flag|unknown shorthand flag|is required for verification|no such file or directory|accepts [0-9]+ arg"; then
+            echo "[FAIL] $label: failed for a usage/flag reason, not verification"; exit 1
+          fi
+          echo "[PASS] $label: rejected as expected"
+          SH
+          chmod +x "$RUNNER_TEMP/expect_fail.sh"
+
+      - name: "Negative (a): wrong issuer"
+        run: |
+          "$RUNNER_TEMP/expect_fail.sh" wrong-issuer verify-blob "manifest/${TAG}.json" \
+            --bundle "${TAG}.bundle" \
+            --certificate-oidc-issuer "https://example.invalid" \
+            --certificate-identity "$EXPECTED_IDENTITY"
+
+      - name: "Negative (b): wrong identity"
+        run: |
+          WRONG_IDENTITY="https://github.com/${{ github.repository }}/.github/workflows/other.yml@${{ github.ref }}"
+          "$RUNNER_TEMP/expect_fail.sh" wrong-identity verify-blob "manifest/${TAG}.json" \
+            --bundle "${TAG}.bundle" \
+            --certificate-oidc-issuer "$EXPECTED_ISSUER" \
+            --certificate-identity "$WRONG_IDENTITY"
+
+      - name: "Negative (c): tampered manifest"
+        run: |
+          set -euo pipefail
+          cp "manifest/${TAG}.json" "$RUNNER_TEMP/tampered.json"
+          printf ' ' >> "$RUNNER_TEMP/tampered.json"
+          "$RUNNER_TEMP/expect_fail.sh" tampered-manifest verify-blob "$RUNNER_TEMP/tampered.json" \
+            --bundle "${TAG}.bundle" \
+            --certificate-oidc-issuer "$EXPECTED_ISSUER" \
+            --certificate-identity "$EXPECTED_IDENTITY"
+
+      - name: "Negative (d): tampered bundle"
+        run: |
+          set -euo pipefail
+          python3 - "${TAG}.bundle" "$RUNNER_TEMP/tampered.bundle" <<'PY'
+          import json, sys
+          src, dst = sys.argv[1], sys.argv[2]
+          with open(src, encoding="utf-8") as f:
+              bundle = json.load(f)
+          # cosign v3 (protobuf bundle) vs legacy bundle layout
+          if "messageSignature" in bundle:
+              holder, key = bundle["messageSignature"], "signature"
+          elif "base64Signature" in bundle:
+              holder, key = bundle, "base64Signature"
+          else:
+              sys.exit(f"no signature field in bundle keys: {list(bundle)}")
+          sig = holder[key]
+          i = len(sig) // 2
+          flipped = "B" if sig[i] == "A" else "A"
+          holder[key] = sig[:i] + flipped + sig[i + 1:]
+          assert holder[key] != sig
+          with open(dst, "w", encoding="utf-8") as f:
+              json.dump(bundle, f)
+          print(f"flipped {key}[{i}] {sig[i]!r} -> {flipped!r}")
+          PY
+          "$RUNNER_TEMP/expect_fail.sh" tampered-bundle verify-blob "manifest/${TAG}.json" \
+            --bundle "$RUNNER_TEMP/tampered.bundle" \
+            --certificate-oidc-issuer "$EXPECTED_ISSUER" \
+            --certificate-identity "$EXPECTED_IDENTITY"
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.TAG }}-sigstore
+          path: |
+            manifest/${{ env.TAG }}.json
+            ${{ env.TAG }}.bundle
+          if-no-files-found: error
+
+  publish:
+    needs: sign
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download signed artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.TAG }}-sigstore
+
+      - name: Attach assets to Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ls -la . manifest
+          gh release upload "$TAG" "manifest/${TAG}.json" "${TAG}.bundle" \
+            --clobber --repo "${{ github.repository }}"
